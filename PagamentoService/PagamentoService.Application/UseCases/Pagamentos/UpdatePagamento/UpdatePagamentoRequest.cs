@@ -1,0 +1,25 @@
+﻿using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace PagamentoService.Application.UseCases.Pagamentos.UpdatePagamento
+{
+    public class UpdatePagamentoRequest : IRequest
+    {
+        public int? Id { get; set; }
+        public double? Valor { get; set; }
+
+        public string? Observacao { get; set; }
+
+        public int? Mes { get; set; }
+
+        public int? PacienteId { get; set; }
+
+        public int? Ano { get; set; }
+
+        public int StatusPagamento { get; set; }
+    }
+}
