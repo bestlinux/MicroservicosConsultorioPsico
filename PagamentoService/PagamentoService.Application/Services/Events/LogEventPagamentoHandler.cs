@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Logging;
 using PagamentoService.Application.Services.Notifications;
 using System;
 using System.Collections.Generic;
@@ -12,11 +13,18 @@ namespace PagamentoService.Application.Services.Events
                  INotificationHandler<PagamentoActionNotification>,
                  INotificationHandler<ErrorNotification>
     {
+        private readonly ILogger<LogEventPagamentoHandler> _logger;
+
+        public LogEventPagamentoHandler(ILogger<LogEventPagamentoHandler> logger)
+        {
+            _logger = logger;
+        }
+    
         public Task Handle(ErrorNotification notification, CancellationToken cancellationToken)
         {
             return Task.Run(() =>
             {
-                Console.WriteLine($"ERROR : '{notification.Error} \n {notification.Stack}'");
+                _logger.LogError($"ERROR : '{notification.Error} \n {notification.Stack}'");
             }, cancellationToken);
         }
 
@@ -24,7 +32,7 @@ namespace PagamentoService.Application.Services.Events
         {
             return Task.Run(() =>
             {
-                Console.WriteLine($"Pagamento para o paciente {notification.PacienteId} - foi {notification.Action.ToString().ToLower()} com sucesso !");
+                _logger.LogInformation($"Pagamento para o paciente {notification.PacienteId} - foi {notification.Action.ToString().ToLower()} com sucesso !");
             }, cancellationToken);
         }
     }

@@ -12,13 +12,34 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using PagamentoService.MessageBus.RecievedMessage;
+using Serilog;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using System.Text.Json;
+using System.Net.Mime;
+using HealthChecks.UI.Client;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog((ctx, loggerConfiguration) =>
+{
+    loggerConfiguration
+        .ReadFrom.Configuration(ctx.Configuration);
+});
 
 builder.Services.ConfigureMessageBusApp(builder.Configuration);
 builder.Services.ConfigurePersistenceApp(builder.Configuration);
 builder.Services.ConfigureApplicationApp();
 builder.Services.AddHostedService<ReceivedPagamentoUpdateMessage>();
+
+var rabbitMqConnectionString = builder.Configuration.GetSection("RabbitMQ").GetSection("Uri").Value;
+
+builder.Services.AddHealthChecks()
+                .AddRabbitMQ(rabbitMqConnectionString,
+                    name: "rabbitmq", tags: new string[] { "messaging" })
+                .AddSqlServer(builder.Configuration.GetConnectionString("SqlServer"),
+                    name: "sqlserver", tags: new string[] { "db", "data" });
+
+builder.Services.AddHealthChecksUI()
+    .AddInMemoryStorage();
 
 builder.Services.AddCors(options =>
 {
@@ -96,6 +117,18 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
+app.UseHealthChecks("/pagamentoservice-ui", new HealthCheckOptions()
+{
+    Predicate = _ => true,
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
+app.UseHealthChecksUI(setup =>
+{
+    setup.UIPath = "/monitor";
+});
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -104,9 +137,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
-app.UseStaticFiles();
 app.UseHttpsRedirection();
-app.UseAuthentication();
+//app.UseStaticFiles();
+//app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

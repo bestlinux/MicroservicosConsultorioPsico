@@ -1,0 +1,20 @@
+{
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7133"
+  },
+  "Routes": [
+    {
+      // Products Microservice Route
+      "DownstreamPathTemplate": "/api/pagamentos",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7010
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/pagamento",
+      "UpstreamHttpMethod": [ "POST" ]
+    } 
+  ]
+}

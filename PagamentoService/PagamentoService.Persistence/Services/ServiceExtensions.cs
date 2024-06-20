@@ -17,7 +17,7 @@ namespace PagamentoService.Persistence.Services
         public static void ConfigurePersistenceApp(this IServiceCollection services,
                                                     IConfiguration configuration)
         {
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var connectionString = configuration.GetConnectionString("SqlServer");
             services.AddDbContext<AppDbContext>(options =>
                      options.UseSqlServer(connectionString, b => b.MigrationsAssembly("PagamentoService.WebApi")));
             

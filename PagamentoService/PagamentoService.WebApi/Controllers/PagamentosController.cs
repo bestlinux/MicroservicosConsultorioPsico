@@ -19,12 +19,14 @@ namespace PagamentoService.WebApi.Controllers
         private readonly IMediator _mediator;
         private readonly IMessageBus _messageBus;
         private readonly string QueueName_Pagamento;
+        private readonly ILogger<PagamentosController> _logger;
 
-        public PagamentosController(IMediator mediator, IMessageBus messageBus, IOptions<RabbitMqConfiguration> rabbitMqOptions)
+        public PagamentosController(IMediator mediator, IMessageBus messageBus, IOptions<RabbitMqConfiguration> rabbitMqOptions, ILogger<PagamentosController> logger)
         {
             _mediator = mediator;
             _messageBus = messageBus;
             QueueName_Pagamento = rabbitMqOptions.Value.QueueName_Pagamento;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -41,6 +43,8 @@ namespace PagamentoService.WebApi.Controllers
                 return BadRequest(validationResult.Errors);
             }
 
+            _logger.LogInformation("Create() criando pagamento no banco de dados ");
+
             var result = await _mediator.Send(request, cancellationToken);
 
             // envia mensagem para atualizar o status do pagamento
@@ -55,8 +59,9 @@ namespace PagamentoService.WebApi.Controllers
                 Mes = result.Mes
             };
 
-            _messageBus.SendMessage(message, QueueName_Pagamento);
+            _logger.LogInformation("Create() enviando mensagem para o Bus para atualizar status de pagamento ");
 
+            _messageBus.SendMessage(message, QueueName_Pagamento);
             return Ok(result);
         }
     }

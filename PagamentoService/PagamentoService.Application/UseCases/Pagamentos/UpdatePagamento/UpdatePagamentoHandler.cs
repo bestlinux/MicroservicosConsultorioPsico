@@ -45,7 +45,7 @@ namespace PagamentoService.Application.UseCases.Pagamentos.UpdatePagamento
                 await _mediator.Publish(new PagamentoActionNotification
                 {
                     PacienteId = request.PacienteId,
-                    Action = ActionNotification.Created
+                    Action = ActionNotification.Updated
                 }, cancellationToken);
 
             }

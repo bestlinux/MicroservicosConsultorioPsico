@@ -1,7 +1,9 @@
 using System;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using PagamentoService.Application.Services.Events;
 using PagamentoService.Domain.Common;
 using PagamentoService.MessageBus.Base;
 using RabbitMQ.Client;
@@ -16,14 +18,16 @@ namespace PagamentoService.MessageBus.SendMessages
         private readonly string _userName;
         private readonly string _password;
         private IConnection _connection;
+        private readonly ILogger<RabbitMqMessageBus> _logger;
 
-        public RabbitMqMessageBus(IOptions<RabbitMqConfiguration> options)
+        public RabbitMqMessageBus(IOptions<RabbitMqConfiguration> options, ILogger<RabbitMqMessageBus> logger)
         {
             _uri = options.Value.Uri;
             _hostName = options.Value.HostName;
             _port = options.Value.Port;
             _userName = options.Value.UserName;
             _password = options.Value.Password;
+            _logger = logger;
         }
 
         public void SendMessage(BaseMessage message, string QueueName)
@@ -48,6 +52,7 @@ namespace PagamentoService.MessageBus.SendMessages
                     routingKey: QueueName,
                     basicProperties: properties,
                     body: body);
+                _logger.LogInformation("SendMessage() mensagem de status de pagamento enviada com sucesso para o RabbitMQ");
             }
         }
 
@@ -66,7 +71,7 @@ namespace PagamentoService.MessageBus.SendMessages
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"can not create connection: {ex.Message}");
+                _logger.LogError($"can not create connection: {ex.Message}");
             }
         }
 
