@@ -12,7 +12,7 @@ using PagamentoService.Persistence.Context;
 namespace PagamentoService.WebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240614131617_Initial")]
+    [Migration("20240701194855_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
