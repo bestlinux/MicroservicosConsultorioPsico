@@ -12,7 +12,7 @@ using PagamentoService.MessageBus.SendMessages;
 namespace PagamentoService.WebApi.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize]
     [ApiController]
     public class PagamentosController : ControllerBase
     {
