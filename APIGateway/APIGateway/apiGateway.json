@@ -15,6 +15,38 @@
       ],
       "UpstreamPathTemplate": "/gateway/pagamento",
       "UpstreamHttpMethod": [ "POST" ]
-    } 
+    },
+    // Identity Microservice Route
+    {
+      "DownstreamPathTemplate": "/api/Users/Login",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7222
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/user/login",
+      "UpstreamHttpMethod": [ "POST", "OPTIONS" ],
+      "HttpHandlerOptions": {
+        "AllowAutoRedirect": false,
+        "UseCookieContainer": false,
+        "UseTracing": false,
+        "UseProxy": true,
+        "MaxConnectionsPerServer": 2147483647
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/Users/Register",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7222
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/user/register",
+      "UpstreamHttpMethod": [ "POST" ]
+    }
   ]
 }

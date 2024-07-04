@@ -1,4 +1,5 @@
 using System;
+using System.Net.Sockets;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -6,7 +7,10 @@ using Newtonsoft.Json;
 using PagamentoService.Application.Services.Events;
 using PagamentoService.Domain.Common;
 using PagamentoService.MessageBus.Base;
+using Polly;
+using Polly.Retry;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Exceptions;
 
 namespace PagamentoService.MessageBus.SendMessages
 {
@@ -19,7 +23,8 @@ namespace PagamentoService.MessageBus.SendMessages
         private readonly string _password;
         private IConnection _connection;
         private readonly ILogger<RabbitMqMessageBus> _logger;
-
+        private bool _isConnected = false;
+        private int retryCount = 5;
         public RabbitMqMessageBus(IOptions<RabbitMqConfiguration> options, ILogger<RabbitMqMessageBus> logger)
         {
             _uri = options.Value.Uri;
@@ -60,14 +65,20 @@ namespace PagamentoService.MessageBus.SendMessages
         {
             try
             {
-                var factory = new ConnectionFactory()
+                var factory = new ConnectionFactory();
+
+                var policy = RetryPolicy.Handle<SocketException>().Or<BrokerUnreachableException>()
+                .WaitAndRetry(retryCount, op => TimeSpan.FromSeconds(Math.Pow(2, op)), (ex, time) =>
                 {
-                    Uri = new Uri(_uri),
-                    HostName = _hostName,
-                    UserName = _userName,
-                    Password = _password
-                };
-                _connection = factory.CreateConnection();
+                    _logger.LogInformation("Couldn't connect to RabbitMQ server...");
+                });
+
+                policy.Execute(() =>
+                {
+                    _connection = factory.CreateConnection();
+                    _isConnected = true;
+                    _logger.LogInformation("RabbitMQ connected!");
+                });
             }
             catch (Exception ex)
             {
