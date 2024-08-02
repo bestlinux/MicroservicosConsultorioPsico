@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PagamentoService.Application.UseCases.Pagamentos.CreatePagamento;
+using PagamentoService.Application.UseCases.Pagamentos.GetAllPagamento;
 using PagamentoService.Application.UseCases.Pagamentos.UpdatePagamento;
 using PagamentoService.Domain.Entities;
 using System;
@@ -17,6 +18,8 @@ namespace ApiConsultorio.Application.UseCases.Pagamentos.Mapper
             CreateMap<CreatePagamentoRequest, Pagamento>();
             CreateMap<Pagamento, CreatePagamentoResponse>();
             CreateMap<UpdatePagamentoRequest, Pagamento>();
+            CreateMap<GetAllPagamentoRequest, Pagamento>();
+            CreateMap<Pagamento, GetAllPagamentoResponse>();
         }
     }
 }

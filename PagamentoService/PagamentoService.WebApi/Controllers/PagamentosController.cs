@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using PagamentoService.Application.Shared.Validator;
 using PagamentoService.Application.UseCases.Pagamentos.CreatePagamento;
+using PagamentoService.Application.UseCases.Pagamentos.GetAllPagamento;
 using PagamentoService.Domain.Entities;
 using PagamentoService.MessageBus.Base;
 using PagamentoService.MessageBus.SendMessages;
@@ -62,6 +63,15 @@ namespace PagamentoService.WebApi.Controllers
             _logger.LogInformation("Create() enviando mensagem para o Bus para atualizar status de pagamento ");
 
             _messageBus.SendMessage(message, QueueName_Pagamento);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<GetAllPagamentoResponse>> GetAll([FromQuery] GetAllPagamentoRequest listaPagamento, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(listaPagamento, cancellationToken);
             return Ok(result);
         }
     }

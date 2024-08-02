@@ -35,30 +35,33 @@ namespace PagamentoService.MessageBus.SendMessages
             _logger = logger;
         }
 
-        public void SendMessage(BaseMessage message, string QueueName)
+        public async Task SendMessage(BaseMessage message, string QueueName)
+        {
+            await Task.Run(() => SendMessageAsync(message, QueueName));
+        }
+
+        public void SendMessageAsync(BaseMessage message, string QueueName) 
         {
             if (!CheckRabbitMqConnection())
                 return;
 
-            using (var channel = _connection.CreateModel())
-            {
-                channel.QueueDeclare(queue: QueueName,
-                    durable: true,
-                    exclusive: false,
-                    autoDelete: false,
-                    arguments: null
-                    );
-                var json = JsonConvert.SerializeObject(message);
-                var body = Encoding.UTF8.GetBytes(json);
-                var properties = channel.CreateBasicProperties();
-                properties.Persistent = true;
+            using var channel = _connection.CreateModel();
+            channel.QueueDeclare(queue: QueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null
+                );
+            var json = JsonConvert.SerializeObject(message);
+            var body = Encoding.UTF8.GetBytes(json);
+            var properties = channel.CreateBasicProperties();
+            properties.Persistent = true;
 
-                channel.BasicPublish(exchange: "",
-                    routingKey: QueueName,
-                    basicProperties: properties,
-                    body: body);
-                _logger.LogInformation("SendMessage() mensagem de status de pagamento enviada com sucesso para o RabbitMQ");
-            }
+            channel.BasicPublish(exchange: "",
+                routingKey: QueueName,
+                basicProperties: properties,
+                body: body);
+            _logger.LogInformation("SendMessage() mensagem de status de pagamento enviada com sucesso para o RabbitMQ");
         }
 
         private void CreateRabbitMqConnection()

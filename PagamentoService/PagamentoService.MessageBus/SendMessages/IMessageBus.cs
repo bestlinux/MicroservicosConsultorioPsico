@@ -4,6 +4,6 @@ using PagamentoService.MessageBus.Base;
 
 namespace PagamentoService.MessageBus.SendMessages { 
     public interface IMessageBus  {
-         void SendMessage(BaseMessage message, string QueueName);
+         Task SendMessage(BaseMessage message, string QueueName);
     }
 }

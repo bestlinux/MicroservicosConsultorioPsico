@@ -16,7 +16,8 @@ namespace PagamentoService.Persistence.Repositories
 
         public async Task<IEnumerable<Pagamento>> LocalizaTodosPagamentosComPaciente()
         {
-            return null;
+            return await _db.Pagamentos.AsNoTracking()
+               .ToListAsync();
         }
 
         public async Task<IEnumerable<Pagamento>> LocalizaTodosPagamentosPorPacienteMesAno(int idPaciente, int Mes, int Ano)

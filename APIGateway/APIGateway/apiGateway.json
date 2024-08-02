@@ -4,7 +4,7 @@
   },
   "Routes": [
     {
-      // Products Microservice Route
+      // Pagamentos Microservice Route
       "DownstreamPathTemplate": "/api/pagamentos",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -14,7 +14,20 @@
         }
       ],
       "UpstreamPathTemplate": "/gateway/pagamento",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": [ "POST", "GET", "OPTIONS" ]
+    },
+    {
+      // Pacientes Microservice Route
+      "DownstreamPathTemplate": "/api/pacientes",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7042
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/paciente",
+      "UpstreamHttpMethod": [ "POST", "GET", "OPTIONS" ]
     },
     // Identity Microservice Route
     {

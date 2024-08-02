@@ -18,7 +18,11 @@ namespace PagamentoService.Application.UseCases.Pagamentos.CreatePagamento
         public int? Mes { get; set; }
 
         public int? PacienteId { get; set; }
+        public string? PacienteNome { get; set; }
 
+        public int? PacienteTipoPagamento { get; set; }
+
+        public int? PacienteDiaVencimento { get; set; }
         public int Ano { get; set; }
     }
 }
